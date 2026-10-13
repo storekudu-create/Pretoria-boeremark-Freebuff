@@ -10,10 +10,99 @@ import type {
 } from './types';
 import { DEMO_CATEGORIES } from './categories';
 
-const XS = [60, 160, 260, 360, 550, 650, 750, 850];
-const ROWS_Y = [90, 190, 380, 480];
-const STALL_W = 90;
-const STALL_H = 60;
+interface StallSeed {
+  number: string;
+  streetName: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
+}
+
+function range(start: number, end: number): string[] {
+  const step = start <= end ? 1 : -1;
+  const out: string[] = [];
+  for (let n = start; step > 0 ? n <= end : n >= end; n += step) out.push(String(n));
+  return out;
+}
+
+function addRun(
+  stalls: StallSeed[],
+  numbers: string[],
+  streetName: string,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  width: number,
+  height: number,
+  rotation = 0,
+): void {
+  const count = Math.max(numbers.length - 1, 1);
+  numbers.forEach((number, i) => {
+    const t = i / count;
+    stalls.push({
+      number,
+      streetName,
+      x: x1 + (x2 - x1) * t,
+      y: y1 + (y2 - y1) * t,
+      width,
+      height,
+      rotation,
+    });
+  });
+}
+
+function buildBoeremarkLayout(): StallSeed[] {
+  const stalls: StallSeed[] = [];
+
+  // Outer perimeter rows traced from the supplied Boeremark reference image.
+  addRun(stalls, ['101', '104', '105', '107', '109', '111', '113', '115', '116A', '117', '118', '119'], 'Wilgerlaan', 170, 72, 735, 58, 48, 28, -2);
+  addRun(stalls, range(121, 134), 'Wilgerlaan', 778, 76, 830, 420, 38, 28, 86);
+  addRun(stalls, ['135', '135A', ...range(136, 141), '141A', ...range(142, 155), '156', '158'], 'Wilgerlaan', 842, 448, 748, 1110, 40, 28, 82);
+  addRun(stalls, ['159', '160', '161', '162', '163', '164', '165', '166', '169', '170', '171A'], 'Wilgerlaan', 708, 1160, 470, 1320, 46, 28, -28);
+  addRun(stalls, ['172', '175', '177', '179', '179C', '179E', '179G'], 'Wilgerlaan', 430, 1345, 78, 1330, 56, 30, -2);
+  addRun(stalls, ['180A', ...range(180, 192), '192A', '192B', '192C', '192D'], 'Olierlaan', 66, 1208, 70, 820, 40, 28, -88);
+  addRun(stalls, ['420L', '420L', '420J', '420H', '420G', '420F', '420E', '420D', '420C', '420B', '420A', ...range(420, 432)], 'Olierlaan', 98, 792, 116, 170, 40, 28, -88);
+
+  // Upper-left and upper-middle internal blocks.
+  addRun(stalls, range(404, 419), 'Wildeperskelaan', 198, 132, 198, 610, 44, 28, -90);
+  addRun(stalls, ['383', '384', '385', '380', '387', '388', '390', '391', '392', '393', '394', '395', '396A'], 'Geelhoutlaan', 292, 196, 322, 606, 44, 28, -88);
+  addRun(stalls, ['361C', '361B'], 'Wilgerlaan', 270, 116, 386, 112, 72, 30, 0);
+  addRun(stalls, ['382', '381', '380', '379', '378', '377', '376', '375', '374', '373', '372'], 'Geelhoutlaan', 375, 224, 386, 565, 44, 28, -88);
+  addRun(stalls, ['361', '362', '363', '366', '368', '369', '370', '371'], 'Kamperboomlaan', 432, 224, 445, 565, 44, 28, -88);
+  addRun(stalls, ['358B', '357', '356', '355', '354', '353', '352', '351', '350', '349', '348', '347'], 'Kamperboomlaan', 502, 142, 510, 545, 54, 30, -88);
+  addRun(stalls, ['337A', '337', '338', '339', '340', '341', '342', '343', '344', '345', '346'], 'Vaderlandswilglaan', 580, 222, 582, 542, 44, 28, -90);
+  addRun(stalls, ['336G', '336C', '336B', '336A', '335', '334', '333', '332', '331', '329', '327'], 'Vaderlandswilglaan', 682, 138, 714, 535, 58, 30, -88);
+
+  // Blocks around Kantferlaan, Spiel area and Groot Kraal.
+  addRun(stalls, ['323', '325'], 'Kantferlaan', 648, 586, 718, 574, 50, 30, -8);
+  addRun(stalls, ['317', '318'], 'Wilgerlaan', 780, 600, 792, 660, 48, 30, -86);
+  addRun(stalls, ['316', '307', '308', '309'], 'Wilgerlaan', 805, 710, 822, 835, 44, 30, -84);
+  addRun(stalls, ['433', '434'], 'Olierlaan', 194, 660, 194, 725, 58, 36, -90);
+  addRun(stalls, ['454', '453', '452', '451', '450'], 'Valleiprunuslaan', 310, 636, 330, 760, 52, 30, -80);
+  addRun(stalls, ['439', '440', '442', '443', '444'], 'Valleiprunuslaan', 122, 870, 190, 954, 46, 30, -4);
+  addRun(stalls, ['449', '448'], 'Valleiprunuslaan', 330, 835, 330, 900, 58, 36, -90);
+  addRun(stalls, ['293', '289', '287', '296'], 'Wildehondlaan', 748, 860, 858, 825, 48, 28, -12);
+
+  // Lower-left market blocks.
+  addRun(stalls, ['193', '194', '195', '196', '197', '198', '199', '200', '201', '202', '203', '203A', '204'], 'Wissinkhoutlaan', 122, 1015, 128, 1235, 42, 28, -88);
+  addRun(stalls, ['216', '215', '214', '213', '212', '211', '210', '209', '208', '207', '206', '205'], 'Wissinkhoutlaan', 182, 1014, 188, 1234, 42, 28, -88);
+  addRun(stalls, range(212, 229), 'Vaalpruimlaan', 260, 1000, 260, 1280, 42, 28, -90);
+  addRun(stalls, ['244', '243', '242', '241', '240', '239', '238', '237', '236', '235', '234', '233', '233A', '230'], 'Papierbaailaan', 335, 1000, 330, 1285, 44, 28, -90);
+  addRun(stalls, ['245', '223', '519', '512', '515', '501', '500B', '231', '232'], 'Papierbaailaan', 388, 1000, 408, 1285, 44, 28, -90);
+
+  // Lower-middle and lower-right internal blocks.
+  addRun(stalls, ['525', '527', '529', '531', '535', '537', '539', '541', '545', '549', '551', '552'], 'Karoblaan', 500, 930, 510, 1240, 48, 28, -88);
+  addRun(stalls, ['524', '526', '528', '530', '534', '536', '538', '540', '543', '544', '548', '550', '552A'], 'Karoblaan', 555, 930, 565, 1245, 48, 28, -88);
+  addRun(stalls, ['522', '520', '518', '516', '514', '510', '508', '506', '504', '502', '500', '500A'], 'Luiperdboomlaan', 638, 930, 650, 1235, 46, 28, -88);
+  addRun(stalls, ['523', '521', '519', '517', '515', '510', '509', '505', '503', '501'], 'Luiperdboomlaan', 690, 930, 700, 1185, 46, 28, -88);
+  addRun(stalls, ['267', '266', '265', '270', '271', '272', '273', '274', '275', '276', '277', '278', '279', '280', '257', '258'], 'Luiperdboomlaan', 730, 910, 760, 1135, 42, 28, -86);
+  addRun(stalls, ['286', '286A', '285', '282', '281', '281A'], 'Wilgerlaan', 875, 920, 822, 1115, 52, 30, -78);
+
+  return stalls;
+}
 
 function svgPlaceholder(label: string, bg: string): string {
   const svg =
@@ -97,17 +186,16 @@ export function buildSeedData(now: Date = new Date()): MarketData {
   const specials: Special[] = [];
   const advertisements: Advertisement[] = [];
 
-  VENDOR_ROWS.forEach((row, i) => {
-    const rowIdx = Math.floor(i / XS.length);
-    const colIdx = i % XS.length;
-    const number = String((rowIdx + 1) * 100 + (colIdx + 1));
-    const streetName = ['Moreleta St', 'Olienhoutlaan', 'Olienhoutlaan', 'Wilgerlaan'][rowIdx];
-    const stallId = `stall-${number}`;
+  const layout = buildBoeremarkLayout();
+  layout.forEach((stallSeed, i) => {
+    const row = VENDOR_ROWS[i % VENDOR_ROWS.length];
+    const number = stallSeed.number;
+    const stallId = `stall-${number}-${i}`;
 
     if (!row) {
       stalls.push({
-        id: stallId, stallNumber: number, streetName,
-        x: XS[colIdx], y: ROWS_Y[rowIdx], width: STALL_W, height: STALL_H, rotation: 0,
+        id: stallId, stallNumber: number, streetName: stallSeed.streetName,
+        x: stallSeed.x, y: stallSeed.y, width: stallSeed.width, height: stallSeed.height, rotation: stallSeed.rotation,
         vendorId: null, categoryId: null, status: 'vacant', featuredLevel: 'free',
         saturdaySpecial: false, sortOrder: i,
       });
@@ -117,7 +205,7 @@ export function buildSeedData(now: Date = new Date()): MarketData {
     const vendorId = `vendor-${number}`;
     vendors.push({
       id: vendorId,
-      businessName: row.name,
+      businessName: `${row.name} (${number})`,
       description: row.desc,
       phone: `072 000 ${number.padStart(4, '0')}`,
       whatsapp: `072 000 ${number.padStart(4, '0')}`,
@@ -142,8 +230,8 @@ export function buildSeedData(now: Date = new Date()): MarketData {
     });
 
     stalls.push({
-      id: stallId, stallNumber: number, streetName,
-      x: XS[colIdx], y: ROWS_Y[rowIdx], width: STALL_W, height: STALL_H, rotation: 0,
+      id: stallId, stallNumber: number, streetName: stallSeed.streetName,
+      x: stallSeed.x, y: stallSeed.y, width: stallSeed.width, height: stallSeed.height, rotation: stallSeed.rotation,
       vendorId, categoryId: row.category,
       status: row.status === 'closed' ? 'closed' : 'open',
       featuredLevel: row.level ?? 'free',

@@ -3,7 +3,7 @@ import type { MarketData, Stall } from '../../shared/types';
 import { categoryColor } from '../../shared/categories';
 
 const VB_W = 1000;
-const VB_H = 620;
+const VB_H = 1450;
 
 interface Props {
   data: MarketData;
@@ -222,6 +222,7 @@ export default function MarketMap({
     if (isSel) { stroke = '#166534'; strokeWidth = 4; }
 
     const labelColor = isVacant || isClosed ? '#7b857c' : '#1f2a20';
+    const fontSize = Math.max(8, Math.min(13, s.height * 0.42, s.width / Math.max(2.8, s.stallNumber.length * 0.48)));
 
     return (
       <g
@@ -238,7 +239,7 @@ export default function MarketMap({
         <rect
           width={s.width}
           height={s.height}
-          rx={6}
+          rx={3}
           fill={fill}
           stroke={stroke}
           strokeWidth={strokeWidth}
@@ -253,7 +254,7 @@ export default function MarketMap({
           y={s.height / 2 + 2}
           textAnchor="middle"
           dominantBaseline="middle"
-          fontSize={15}
+          fontSize={fontSize}
           fontWeight={isSel || isHi ? 700 : 600}
           fill={labelColor}
           style={{ pointerEvents: 'none', userSelect: 'none' }}
@@ -312,22 +313,66 @@ export default function MarketMap({
         <g transform={`translate(${tf.x} ${tf.y}) scale(${tf.k})`}>
           <rect x={-200} y={-200} width={VB_W + 400} height={VB_H + 400} fill="#eef1ec" />
           {/* ground plot */}
-          <rect x={20} y={20} width={VB_W - 40} height={VB_H - 40} fill="#e3e8df" stroke="#cbd5c9" strokeWidth={2} rx={10} />
-          {/* internal streets drawn between stall rows */}
-          <rect x={20} y={162} width={VB_W - 40} height={26} fill="#d7d2c4" />
-          <text x={VB_W - 40} y={180} textAnchor="end" fontSize={13} fill="#6b6f63" fontWeight={600}>Olienhoutlaan</text>
-          <rect x={466} y={20} width={26} height={VB_H - 40} fill="#d7d2c4" />
-          <text x={479} y={330} textAnchor="middle" fontSize={13} fill="#6b6f63" fontWeight={600} transform="rotate(-90 479 330)">Wilgerlaan</text>
-          <rect x={20} y={342} width={VB_W - 40} height={26} fill="#d7d2c4" />
-          <text x={40} y={360} fontSize={13} fill="#6b6f63" fontWeight={600}>Olienhoutlaan</text>
-          {/* boundary street labels */}
-          <text x={VB_W / 2} y={14} textAnchor="middle" fontSize={14} fill="#575b50" fontWeight={700}>Moreleta St</text>
-          {/* entrance markers */}
-          <rect x={452} y={20} width={14} height={26} fill="#eef1ec" />
-          <text x={459} y={60} textAnchor="middle" fontSize={10} fill="#575b50">Gate</text>
+          <path
+            d="M70 90 L760 55 Q830 58 850 150 L900 780 Q900 1010 760 1210 L590 1355 L70 1340 Z"
+            fill="#eadfcb"
+            stroke="#c4b9a4"
+            strokeWidth={2}
+          />
+          <path
+            d="M64 78 L770 42 Q850 46 872 142 L926 790 Q928 1035 776 1238 L600 1386 L54 1368"
+            fill="none"
+            stroke="#d8d3c6"
+            strokeWidth={26}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M83 1350 L88 90"
+            fill="none"
+            stroke="#d8d3c6"
+            strokeWidth={24}
+            strokeLinecap="round"
+          />
+          <path
+            d="M172 120 L205 1275 M250 124 L284 1288 M330 126 L365 1290 M428 170 L458 620 M485 140 L525 585 M565 150 L610 575 M710 120 L760 560"
+            fill="none"
+            stroke="#f4f1e8"
+            strokeWidth={20}
+            strokeLinecap="round"
+          />
+          <path
+            d="M105 825 L390 790 M406 650 L650 575 M478 915 L760 865 M410 1300 L610 1360"
+            fill="none"
+            stroke="#f4f1e8"
+            strokeWidth={20}
+            strokeLinecap="round"
+          />
+          <path d="M430 640 L725 590 L760 820 L650 890 L430 900 Z" fill="#bff3cb" stroke="#a6ddb4" strokeWidth={1.5} />
+          <text x={585} y={800} textAnchor="middle" fontSize={23} fill="#4f7d55" fontStyle="italic">Groot Kraal</text>
+          <path d="M645 230 L752 205 L775 530 L655 552 Z" fill="#bff3cb" stroke="#a6ddb4" strokeWidth={1.5} />
+          <rect x={665} y={250} width={70} height={120} fill="#8ed8e5" opacity={0.85} />
+          <text x={705} y={455} textAnchor="middle" fontSize={17} fill="#4f7d55" fontStyle="italic">Klein Kraal</text>
+          <path d="M625 605 L705 585 L732 675 L650 700 Z" fill="#c8f4d0" stroke="#a6ddb4" strokeWidth={1.5} />
+          <text x={656} y={640} fontSize={16} fill="#4f7d55">Speel area</text>
+          <text x={470} y={622} fontSize={18} fill="#2d342d" fontWeight={700} transform="rotate(-12 470 622)">Kantferlaan</text>
+          <text x={218} y={405} fontSize={17} fill="#2d342d" fontWeight={700} transform="rotate(86 218 405)">Wildeperskelaan</text>
+          <text x={322} y={410} fontSize={17} fill="#2d342d" fontWeight={700} transform="rotate(86 322 410)">Geelhoutlaan</text>
+          <text x={455} y={395} fontSize={17} fill="#2d342d" fontWeight={700} transform="rotate(86 455 395)">Kamperboomlaan</text>
+          <text x={620} y={240} fontSize={17} fill="#2d342d" fontWeight={700} transform="rotate(73 620 240)">Vaderlandswilglaan</text>
+          <text x={98} y={742} fontSize={17} fill="#2d342d" fontWeight={700} transform="rotate(-86 98 742)">Olierlaan</text>
+          <text x={302} y={845} fontSize={17} fill="#2d342d" fontWeight={700} transform="rotate(-84 302 845)">Valleiprunuslaan</text>
+          <text x={292} y={1130} fontSize={17} fill="#2d342d" fontWeight={700} transform="rotate(-90 292 1130)">Vaalpruimlaan</text>
+          <text x={207} y={1160} fontSize={17} fill="#2d342d" fontWeight={700} transform="rotate(-90 207 1160)">Wissinkhoutlaan</text>
+          <text x={414} y={1135} fontSize={17} fill="#2d342d" fontWeight={700} transform="rotate(82 414 1135)">Papierbaailaan</text>
+          <text x={600} y={1125} fontSize={17} fill="#2d342d" fontWeight={700} transform="rotate(84 600 1125)">Karoblaan</text>
+          <text x={740} y={1080} fontSize={17} fill="#2d342d" fontWeight={700} transform="rotate(84 740 1080)">Luiperdboomlaan</text>
+          <text x={840} y={830} fontSize={17} fill="#2d342d" fontWeight={700} transform="rotate(86 840 830)">Wilgerlaan</text>
+          <text x={165} y={82} fontSize={17} fill="#2d342d" fontWeight={700} transform="rotate(-5 165 82)">Wilgerlaan</text>
+          <text x={545} y={925} fontSize={17} fill="#2d342d" fontWeight={700} transform="rotate(-12 545 925)">Stinkhoutlaan</text>
           {streets.length > 0 && (
-            <text x={40} y={VB_H - 12} fontSize={11} fill="#8a8f81">
-              Demo layout — street names from reference: {streets.join(' · ')}
+            <text x={40} y={VB_H - 18} fontSize={11} fill="#8a8f81">
+              Traced demo layout from supplied Pretoria Boeremark reference: {streets.join(' · ')}
             </text>
           )}
           {stalls.map(renderStall)}

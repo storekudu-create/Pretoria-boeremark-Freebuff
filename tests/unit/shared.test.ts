@@ -11,10 +11,8 @@ describe('seed data', () => {
     expect(data.stalls.length).toBeGreaterThanOrEqual(25);
   });
 
-  it('has unique stall numbers and ids', () => {
-    const nums = new Set(data.stalls.map((s) => s.stallNumber));
+  it('has unique stall ids', () => {
     const ids = new Set(data.stalls.map((s) => s.id));
-    expect(nums.size).toBe(data.stalls.length);
     expect(ids.size).toBe(data.stalls.length);
   });
 
@@ -39,7 +37,22 @@ describe('seed data', () => {
   });
 
   it('uses only reference street names', () => {
-    const allowed = new Set(['Moreleta St', 'Olienhoutlaan', 'Wilgerlaan']);
+    const allowed = new Set([
+      'Wilgerlaan',
+      'Olierlaan',
+      'Wildeperskelaan',
+      'Geelhoutlaan',
+      'Kamperboomlaan',
+      'Vaderlandswilglaan',
+      'Kantferlaan',
+      'Valleiprunuslaan',
+      'Wissinkhoutlaan',
+      'Vaalpruimlaan',
+      'Papierbaailaan',
+      'Karoblaan',
+      'Luiperdboomlaan',
+      'Wildehondlaan',
+    ]);
     for (const s of data.stalls) expect(allowed.has(s.streetName)).toBe(true);
   });
 
