@@ -1,0 +1,7 @@
+{
+  "name": "bundle-check",
+  "main": "worker.js",
+  "compatibility_date": "2025-10-01",
+  "d1_databases": [{ "binding": "DB", "database_name": "bundle-check", "database_id": "local-check" }],
+  "vars": { "DEMO_MODE": "1" }
+}

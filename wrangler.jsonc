@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "boeremark-map-demo",
+  "main": "worker/index.ts",
+  "compatibility_date": "2025-10-01",
+  "assets": {
+    "directory": "dist",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "boeremark-demo",
+      "database_id": "local-demo"
+    }
+  ],
+  "vars": {
+    "ADMIN_PASSWORD_HASH": "",
+    "DEMO_MODE": "1"
+  }
+}
