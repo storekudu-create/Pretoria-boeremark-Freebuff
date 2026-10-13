@@ -1,6 +1,6 @@
 /* Market Map demo service worker.
-   Network-first for the API (fresh data when online), cache-first for
-   same-origin static assets, offline fallback from cache. */
+   Network-first for the API and app shell so map layout fixes are visible
+   immediately after deployment, with cached fallback for offline use. */
 const VERSION = 'bm-sw-v1';
 const STATIC_CACHE = `${VERSION}-static`;
 const API_CACHE = `${VERSION}-api`;
@@ -18,7 +18,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
       .then((keys) => Promise.all(
-        keys.filter((k) => !k.startsWith(VERSION)).map((k) => caches.delete(k)),
+        keys.filter((k) => k.startsWith('bm-sw-') && !k.startsWith(VERSION)).map((k) => caches.delete(k)),
       ))
       .then(() => self.clients.claim()),
   );
@@ -46,19 +46,16 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static assets & navigations: cache-first, refresh in background.
+  // Static assets & navigations: network-first so corrected SVG/data bundles replace old cached layouts.
   event.respondWith(
-    caches.match(req).then((hit) => {
-      const refresh = fetch(req)
-        .then((res) => {
-          if (res && res.ok) {
-            const copy = res.clone();
-            void caches.open(STATIC_CACHE).then((cache) => cache.put(req, copy));
-          }
-          return res;
-        })
-        .catch(() => hit);
-      return hit || refresh;
-    }),
+    fetch(req)
+      .then((res) => {
+        if (res && res.ok) {
+          const copy = res.clone();
+          void caches.open(STATIC_CACHE).then((cache) => cache.put(req, copy));
+        }
+        return res;
+      })
+      .catch(() => caches.match(req).then((hit) => hit || caches.match('/'))),
   );
 });
