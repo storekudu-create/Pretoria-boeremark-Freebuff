@@ -11,7 +11,8 @@ import type { Lang } from './lib/i18n';
 import { fetchMarketData, trackEvent } from './lib/api';
 
 const LS_LANG = 'bm_lang';
-const LS_DATA = 'bm_data_v1';
+const LS_DATA = 'bm_data_pdf_layout_v2';
+const OLD_DATA_KEYS = ['bm_data_v1'];
 
 export type ViewId = 'home' | 'search' | 'stalls' | 'specials' | 'categories' | 'admin';
 
@@ -75,6 +76,7 @@ export function StoreProvider({ children }: { children: ReactNode }): React.Reac
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    try { OLD_DATA_KEYS.forEach((key) => localStorage.removeItem(key)); } catch { /* ignore */ }
     try {
       const d = await fetchMarketData();
       setData(d);
