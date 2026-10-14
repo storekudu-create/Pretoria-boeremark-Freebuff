@@ -1,0 +1,10 @@
+{
+  "description": "Interactive market map with numbered stalls allowing customers to easily locate and explore each vendor at Pretoria Boeremark.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
