@@ -7,10 +7,18 @@ import {
   type PointerEvent as ReactPointerEvent,
   type WheelEvent as ReactWheelEvent,
 } from "react"
-import compressedMap from "../assets/pretoria-boeremark-map.svg.gz.b64?raw"
 
-type ViewBox = { x: number; y: number; width: number; height: number }
-type Point = { x: number; y: number }
+type ViewBox = {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+type Point = {
+  x: number
+  y: number
+}
 
 type MarketMapProps = {
   selectedKeys: string[]
@@ -25,24 +33,16 @@ export type MarketMapHandle = {
   focusStalls: (keys: string[]) => void
 }
 
-const FULL_VIEW: ViewBox = { x: 0, y: 0, width: 1000, height: 1500 }
+const FULL_VIEW: ViewBox = { x: 0, y: 0, width: 1044, height: 1507 }
 const MIN_WIDTH = FULL_VIEW.width / 6
+const MAP_RATIO = FULL_VIEW.height / FULL_VIEW.width
 
 function clampView(view: ViewBox): ViewBox {
   const width = Math.min(FULL_VIEW.width, Math.max(MIN_WIDTH, view.width))
-  const height = width * 1.5
+  const height = width * MAP_RATIO
   const x = Math.min(FULL_VIEW.width - width, Math.max(0, view.x))
   const y = Math.min(FULL_VIEW.height - height, Math.max(0, view.y))
   return { x, y, width, height }
-}
-
-async function inflateMap(base64: string): Promise<string> {
-  const clean = base64.trim()
-  const binary = atob(clean)
-  const bytes = new Uint8Array(binary.length)
-  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i)
-  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))
-  return await new Response(stream).text()
 }
 
 const MarketMap = forwardRef<MarketMapHandle, MarketMapProps>(
@@ -54,16 +54,23 @@ const MarketMap = forwardRef<MarketMapHandle, MarketMapProps>(
     const viewOriginRef = useRef<ViewBox>(FULL_VIEW)
     const pinchDistanceRef = useRef<number | null>(null)
     const movedRef = useRef(false)
-    const [view, setView] = useState<ViewBox>(FULL_VIEW)
     const [mapMarkup, setMapMarkup] = useState("")
+    const [view, setView] = useState<ViewBox>(FULL_VIEW)
 
     useEffect(() => {
       let active = true
-      inflateMap(compressedMap)
-        .then((svg) => {
-          if (active) setMapMarkup(svg)
+      fetch(`${import.meta.env.BASE_URL}pretoria-boeremark-map.svg`)
+        .then((response) => {
+          if (!response.ok) throw new Error("Unable to load the market map")
+          return response.text()
         })
-        .catch((error) => console.error("Unable to load market map", error))
+        .then((markup) => {
+          if (active) setMapMarkup(markup)
+        })
+        .catch((error: unknown) => {
+          console.error(error)
+        })
+
       return () => {
         active = false
       }
@@ -81,6 +88,7 @@ const MarketMap = forwardRef<MarketMapHandle, MarketMapProps>(
       const svg = getSvg()
       const matrix = svg?.getScreenCTM()
       if (!svg || !matrix) return null
+
       const point = svg.createSVGPoint()
       point.x = clientX
       point.y = clientY
@@ -107,6 +115,7 @@ const MarketMap = forwardRef<MarketMapHandle, MarketMapProps>(
     const focusStalls = (keys: string[]) => {
       const svg = getSvg()
       if (!svg || keys.length === 0) return
+
       const boxes = keys.flatMap((key) => {
         const element = svg.querySelector<SVGGraphicsElement>(
           `[data-stall-key="${CSS.escape(key)}"]`,
@@ -114,6 +123,7 @@ const MarketMap = forwardRef<MarketMapHandle, MarketMapProps>(
         return element ? [element.getBBox()] : []
       })
       if (boxes.length === 0) return
+
       const minX = Math.min(...boxes.map((box) => box.x))
       const minY = Math.min(...boxes.map((box) => box.y))
       const maxX = Math.max(...boxes.map((box) => box.x + box.width))
@@ -121,7 +131,8 @@ const MarketMap = forwardRef<MarketMapHandle, MarketMapProps>(
       const contentWidth = Math.max(90, maxX - minX + 80)
       const contentHeight = Math.max(135, maxY - minY + 120)
       const width = Math.max(contentWidth, contentHeight / 1.5)
-      const height = width * 1.5
+      const height = width * MAP_RATIO
+
       updateView({
         x: (minX + maxX) / 2 - width / 2,
         y: (minY + maxY) / 2 - height / 2,
@@ -140,9 +151,12 @@ const MarketMap = forwardRef<MarketMapHandle, MarketMapProps>(
     useEffect(() => {
       const svg = getSvg()
       if (!svg) return
-      svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.width} ${view.height}`)
+      svg.setAttribute(
+        "viewBox",
+        `${view.x} ${view.y} ${view.width} ${view.height}`,
+      )
       svg.setAttribute("preserveAspectRatio", "xMidYMid meet")
-    }, [view, mapMarkup])
+    }, [mapMarkup, view])
 
     useEffect(() => {
       const svg = getSvg()
@@ -151,10 +165,13 @@ const MarketMap = forwardRef<MarketMapHandle, MarketMapProps>(
       svg.querySelectorAll<SVGElement>("[data-stall-key]").forEach((stall) => {
         const isSelected = selected.has(stall.dataset.stallKey ?? "")
         stall.classList.toggle("is-selected", isSelected)
-        if (isSelected) stall.setAttribute("aria-current", "true")
-        else stall.removeAttribute("aria-current")
+        if (isSelected) {
+          stall.setAttribute("aria-current", "true")
+        } else {
+          stall.removeAttribute("aria-current")
+        }
       })
-    }, [selectedKeys, mapMarkup])
+    }, [mapMarkup, selectedKeys])
 
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
       event.preventDefault()
@@ -162,51 +179,68 @@ const MarketMap = forwardRef<MarketMapHandle, MarketMapProps>(
         movedRef.current = false
         return
       }
-      const target = (event.target as Element).closest<SVGElement>("[data-stall-key]")
+      const target = (event.target as Element).closest<SVGElement>(
+        "[data-stall-key]",
+      )
       const key = target?.dataset.stallKey
       if (key) onStallSelect(key)
     }
 
     const handleWheel = (event: ReactWheelEvent<HTMLDivElement>) => {
       event.preventDefault()
-      zoomAt(event.deltaY > 0 ? 1.14 : 0.88, clientToSvg(event.clientX, event.clientY))
+      const point = clientToSvg(event.clientX, event.clientY)
+      zoomAt(event.deltaY > 0 ? 1.14 : 0.88, point)
     }
 
     const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
       event.currentTarget.setPointerCapture(event.pointerId)
-      pointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY })
+      pointersRef.current.set(event.pointerId, {
+        x: event.clientX,
+        y: event.clientY,
+      })
       movedRef.current = false
       dragOriginRef.current = { x: event.clientX, y: event.clientY }
       viewOriginRef.current = viewRef.current
+
       if (pointersRef.current.size === 2) {
         const [first, second] = [...pointersRef.current.values()]
-        pinchDistanceRef.current = Math.hypot(second.x - first.x, second.y - first.y)
+        pinchDistanceRef.current = Math.hypot(
+          second.x - first.x,
+          second.y - first.y,
+        )
       }
     }
 
     const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
       if (!pointersRef.current.has(event.pointerId)) return
-      pointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY })
+      pointersRef.current.set(event.pointerId, {
+        x: event.clientX,
+        y: event.clientY,
+      })
+
       if (pointersRef.current.size === 2) {
         const [first, second] = [...pointersRef.current.values()]
         const distance = Math.hypot(second.x - first.x, second.y - first.y)
         const previousDistance = pinchDistanceRef.current
         if (previousDistance && distance > 0) {
-          zoomAt(
-            previousDistance / distance,
-            clientToSvg((first.x + second.x) / 2, (first.y + second.y) / 2),
+          const midpoint = clientToSvg(
+            (first.x + second.x) / 2,
+            (first.y + second.y) / 2,
           )
+          zoomAt(previousDistance / distance, midpoint)
           movedRef.current = true
         }
         pinchDistanceRef.current = distance
         return
       }
+
       const origin = dragOriginRef.current
       const rect = getSvg()?.getBoundingClientRect()
       if (!origin || !rect) return
       const dx = event.clientX - origin.x
       const dy = event.clientY - origin.y
       if (Math.hypot(dx, dy) > 5) movedRef.current = true
+
       const start = viewOriginRef.current
       updateView({
         ...start,
@@ -232,6 +266,7 @@ const MarketMap = forwardRef<MarketMapHandle, MarketMapProps>(
         className="map-viewport"
         role="application"
         aria-label={ariaLabel}
+        aria-busy={!mapMarkup}
         tabIndex={0}
         onClick={handleClick}
         onWheel={handleWheel}
