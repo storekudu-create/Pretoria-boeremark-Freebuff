@@ -210,6 +210,8 @@ export default function App() {
             <span>{language === "af" ? "Oop ruimtes" : "Open spaces"}</span>
             <span className="legend-swatch water-swatch" />
             <span>{language === "af" ? "Waterloop" : "Watercourse"}</span>
+            <span className="legend-swatch toilet-swatch">WC</span>
+            <span>{language === "af" ? "Toilette" : "Toilets"}</span>
           </div>
         </aside>
       </section>
