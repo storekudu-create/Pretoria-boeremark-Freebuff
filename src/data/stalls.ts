@@ -1,369 +1,506 @@
 export type Stall = {
   key: string
+
   number: string
+
   vendorName?: string
+
   category?: string
+
   description?: string
 }
 
 export const stalls: Stall[] = [
-  { key: "101", number: "101" },
-  { key: "104", number: "104" },
-  { key: "105", number: "105" },
-  { key: "107", number: "107" },
-  { key: "109", number: "109" },
-  { key: "111", number: "111" },
-  { key: "113", number: "113" },
-  { key: "115", number: "115" },
-  { key: "116a", number: "116A" },
-  { key: "117", number: "117" },
-  { key: "118", number: "118" },
-  { key: "119", number: "119" },
-  { key: "121", number: "121" },
-  { key: "122", number: "122" },
-  { key: "123", number: "123" },
-  { key: "124", number: "124" },
-  { key: "125", number: "125" },
-  { key: "126", number: "126" },
-  { key: "127", number: "127" },
-  { key: "128", number: "128" },
-  { key: "129", number: "129" },
-  { key: "130", number: "130" },
-  { key: "131", number: "131" },
-  { key: "132", number: "132" },
-  { key: "133", number: "133" },
-  { key: "134", number: "134" },
-  { key: "135", number: "135" },
-  { key: "135a", number: "135A" },
-  { key: "136", number: "136" },
-  { key: "137", number: "137" },
-  { key: "138", number: "138" },
-  { key: "139", number: "139" },
-  { key: "140", number: "140" },
-  { key: "141", number: "141" },
-  { key: "141a", number: "141A" },
-  { key: "142", number: "142" },
-  { key: "143", number: "143" },
-  { key: "144", number: "144" },
-  { key: "145", number: "145" },
-  { key: "146", number: "146" },
-  { key: "147", number: "147" },
-  { key: "148", number: "148" },
-  { key: "149", number: "149" },
-  { key: "150", number: "150" },
-  { key: "151", number: "151" },
-  { key: "153", number: "153" },
-  { key: "154", number: "154" },
-  { key: "155", number: "155" },
-  { key: "156", number: "156" },
-  { key: "158", number: "158" },
-  { key: "159", number: "159" },
-  { key: "160", number: "160" },
-  { key: "161", number: "161" },
-  { key: "162", number: "162" },
-  { key: "163", number: "163" },
-  { key: "164", number: "164" },
-  { key: "165", number: "165" },
-  { key: "166", number: "166" },
-  { key: "171a", number: "171A" },
-  { key: "170", number: "170" },
-  { key: "169", number: "169" },
-  { key: "179g", number: "179G" },
-  { key: "179e", number: "179E" },
-  { key: "179c", number: "179C" },
-  { key: "179", number: "179" },
-  { key: "177", number: "177" },
-  { key: "175", number: "175" },
-  { key: "172", number: "172" },
-  { key: "432", number: "432" },
-  { key: "431", number: "431" },
-  { key: "430", number: "430" },
-  { key: "429", number: "429" },
-  { key: "428", number: "428" },
-  { key: "427", number: "427" },
-  { key: "426", number: "426" },
-  { key: "424", number: "424" },
-  { key: "423", number: "423" },
-  { key: "422", number: "422" },
-  { key: "421", number: "421" },
-  { key: "420", number: "420" },
-  { key: "420a", number: "420A" },
-  { key: "420b", number: "420B" },
-  { key: "420c", number: "420C" },
-  { key: "420d", number: "420D" },
-  { key: "420e", number: "420E" },
-  { key: "420f", number: "420F" },
-  { key: "420g", number: "420G" },
-  { key: "420h", number: "420H" },
-  { key: "420i", number: "420I" },
-  { key: "420j", number: "420J" },
-  { key: "420l-a", number: "420L" },
-  { key: "404", number: "404" },
-  { key: "405", number: "405" },
-  { key: "406", number: "406" },
-  { key: "407", number: "407" },
-  { key: "408", number: "408" },
-  { key: "409", number: "409" },
-  { key: "410", number: "410" },
-  { key: "411", number: "411" },
-  { key: "412", number: "412" },
-  { key: "413", number: "413" },
-  { key: "414", number: "414" },
-  { key: "415", number: "415" },
-  { key: "416", number: "416" },
-  { key: "417", number: "417" },
-  { key: "418", number: "418" },
-  { key: "419", number: "419" },
-  { key: "361b", number: "361B" },
-  { key: "358b", number: "358B" },
-  { key: "336g", number: "336G" },
-  { key: "336c", number: "336C" },
-  { key: "336b", number: "336B" },
-  { key: "336a", number: "336A" },
-  { key: "335", number: "335" },
-  { key: "334", number: "334" },
-  { key: "333", number: "333" },
-  { key: "332", number: "332" },
-  { key: "331", number: "331" },
-  { key: "329", number: "329" },
-  { key: "327", number: "327" },
-  { key: "383", number: "383" },
-  { key: "384", number: "384" },
-  { key: "385", number: "385" },
-  { key: "380-a", number: "380" },
-  { key: "387", number: "387" },
-  { key: "388", number: "388" },
-  { key: "390", number: "390" },
-  { key: "391", number: "391" },
-  { key: "392", number: "392" },
-  { key: "393", number: "393" },
-  { key: "394", number: "394" },
-  { key: "396a", number: "396A" },
-  { key: "382", number: "382" },
-  { key: "381", number: "381" },
-  { key: "380-b", number: "380" },
-  { key: "379", number: "379" },
-  { key: "378", number: "378" },
-  { key: "377", number: "377" },
-  { key: "376", number: "376" },
-  { key: "375", number: "375" },
-  { key: "374", number: "374" },
-  { key: "373", number: "373" },
-  { key: "372", number: "372" },
-  { key: "395", number: "395" },
-  { key: "361", number: "361" },
-  { key: "362", number: "362" },
-  { key: "363", number: "363" },
-  { key: "366", number: "366" },
-  { key: "368", number: "368" },
-  { key: "369", number: "369" },
-  { key: "370", number: "370" },
-  { key: "371", number: "371" },
-  { key: "357", number: "357" },
-  { key: "356", number: "356" },
-  { key: "355", number: "355" },
-  { key: "354", number: "354" },
-  { key: "353", number: "353" },
-  { key: "352", number: "352" },
-  { key: "351", number: "351" },
-  { key: "350", number: "350" },
-  { key: "349", number: "349" },
-  { key: "348", number: "348" },
-  { key: "347", number: "347" },
-  { key: "337a", number: "337A" },
-  { key: "337", number: "337" },
-  { key: "338", number: "338" },
-  { key: "339", number: "339" },
-  { key: "340", number: "340" },
-  { key: "341", number: "341" },
-  { key: "342", number: "342" },
-  { key: "343", number: "343" },
-  { key: "344", number: "344" },
-  { key: "345", number: "345" },
-  { key: "346", number: "346" },
-  { key: "323", number: "323" },
-  { key: "325", number: "325" },
-  { key: "317", number: "317" },
-  { key: "318", number: "318" },
-  { key: "316", number: "316" },
-  { key: "307", number: "307" },
-  { key: "308", number: "308" },
-  { key: "309", number: "309" },
-  { key: "296", number: "296" },
-  { key: "293", number: "293" },
-  { key: "289", number: "289" },
-  { key: "287", number: "287" },
-  { key: "286", number: "286" },
-  { key: "286a", number: "286A" },
-  { key: "285", number: "285" },
-  { key: "282", number: "282" },
-  { key: "281", number: "281" },
-  { key: "281a", number: "281A" },
-  { key: "433", number: "433" },
-  { key: "434", number: "434" },
-  { key: "454", number: "454" },
-  { key: "453", number: "453" },
-  { key: "452", number: "452" },
-  { key: "451", number: "451" },
-  { key: "450", number: "450" },
-  { key: "449", number: "449" },
-  { key: "448", number: "448" },
-  { key: "439", number: "439" },
-  { key: "440", number: "440" },
-  { key: "442", number: "442" },
-  { key: "443", number: "443" },
-  { key: "444", number: "444" },
-  { key: "192d", number: "192D" },
-  { key: "192c", number: "192C" },
-  { key: "192b", number: "192B" },
-  { key: "192a", number: "192A" },
-  { key: "192", number: "192" },
-  { key: "191", number: "191" },
-  { key: "190", number: "190" },
-  { key: "189", number: "189" },
-  { key: "188", number: "188" },
-  { key: "187", number: "187" },
-  { key: "186", number: "186" },
-  { key: "185", number: "185" },
-  { key: "184", number: "184" },
-  { key: "183", number: "183" },
-  { key: "182", number: "182" },
-  { key: "181", number: "181" },
-  { key: "180", number: "180" },
-  { key: "180a", number: "180A" },
-  { key: "193", number: "193" },
-  { key: "194", number: "194" },
-  { key: "195", number: "195" },
-  { key: "196", number: "196" },
-  { key: "197", number: "197" },
-  { key: "198", number: "198" },
-  { key: "199", number: "199" },
-  { key: "200", number: "200" },
-  { key: "201", number: "201" },
-  { key: "202", number: "202" },
-  { key: "203", number: "203" },
-  { key: "203a", number: "203A" },
-  { key: "204", number: "204" },
-  { key: "216", number: "216" },
-  { key: "215", number: "215" },
-  { key: "214", number: "214" },
-  { key: "213", number: "213" },
-  { key: "212-a", number: "212" },
-  { key: "211", number: "211" },
-  { key: "210-a", number: "210" },
-  { key: "209", number: "209" },
-  { key: "208", number: "208" },
-  { key: "207", number: "207" },
-  { key: "206", number: "206" },
-  { key: "205", number: "205" },
-  { key: "212-b", number: "212" },
-  { key: "219", number: "219" },
-  { key: "210-b", number: "210" },
-  { key: "220", number: "220" },
-  { key: "221", number: "221" },
-  { key: "222", number: "222" },
-  { key: "223-a", number: "223" },
-  { key: "224", number: "224" },
-  { key: "225", number: "225" },
-  { key: "226", number: "226" },
-  { key: "227", number: "227" },
-  { key: "228", number: "228" },
-  { key: "229", number: "229" },
-  { key: "244", number: "244" },
-  { key: "243", number: "243" },
-  { key: "242", number: "242" },
-  { key: "241", number: "241" },
-  { key: "240", number: "240" },
-  { key: "239", number: "239" },
-  { key: "238", number: "238" },
-  { key: "237", number: "237" },
-  { key: "236", number: "236" },
-  { key: "235", number: "235" },
-  { key: "234", number: "234" },
-  { key: "233", number: "233" },
-  { key: "233a", number: "233A" },
-  { key: "230", number: "230" },
-  { key: "245", number: "245" },
-  { key: "223-b", number: "223" },
-  { key: "519-a", number: "519" },
-  { key: "512", number: "512" },
-  { key: "515-a", number: "515" },
-  { key: "501-a", number: "501" },
-  { key: "500b", number: "500B" },
-  { key: "231", number: "231" },
-  { key: "525", number: "525" },
-  { key: "527", number: "527" },
-  { key: "529", number: "529" },
-  { key: "531", number: "531" },
-  { key: "535", number: "535" },
-  { key: "537", number: "537" },
-  { key: "539", number: "539" },
-  { key: "541", number: "541" },
-  { key: "542", number: "542" },
-  { key: "545", number: "545" },
-  { key: "549", number: "549" },
-  { key: "551", number: "551" },
-  { key: "552", number: "552" },
-  { key: "524", number: "524" },
-  { key: "526", number: "526" },
-  { key: "528", number: "528" },
-  { key: "530", number: "530" },
-  { key: "534", number: "534" },
-  { key: "536", number: "536" },
-  { key: "538", number: "538" },
-  { key: "540", number: "540" },
-  { key: "543", number: "543" },
-  { key: "544", number: "544" },
-  { key: "548", number: "548" },
-  { key: "550", number: "550" },
-  { key: "552a", number: "552A" },
-  { key: "522", number: "522" },
-  { key: "520", number: "520" },
-  { key: "518", number: "518" },
-  { key: "516", number: "516" },
-  { key: "514", number: "514" },
-  { key: "510-a", number: "510" },
-  { key: "508", number: "508" },
-  { key: "506", number: "506" },
-  { key: "504", number: "504" },
-  { key: "502", number: "502" },
-  { key: "500", number: "500" },
-  { key: "500a", number: "500A" },
-  { key: "523", number: "523" },
-  { key: "521", number: "521" },
-  { key: "519-b", number: "519" },
-  { key: "517", number: "517" },
-  { key: "515-b", number: "515" },
-  { key: "510-b", number: "510" },
-  { key: "509-a", number: "509" },
-  { key: "509-b", number: "509" },
-  { key: "505", number: "505" },
-  { key: "503", number: "503" },
-  { key: "501-b", number: "501" },
-  { key: "267", number: "267" },
-  { key: "266", number: "266" },
-  { key: "265", number: "265" },
-  { key: "258", number: "258" },
-  { key: "257", number: "257" },
-  { key: "270", number: "270" },
-  { key: "271", number: "271" },
-  { key: "272", number: "272" },
-  { key: "273", number: "273" },
-  { key: "274", number: "274" },
-  { key: "275", number: "275" },
-  { key: "276", number: "276" },
-  { key: "277", number: "277" },
-  { key: "278", number: "278" },
-  { key: "279", number: "279" },
-  { key: "280", number: "280" },
+  { key: "available-rect138", number: "379" },
+
+  { key: "available-rect139", number: "109" },
+
+  { key: "available-rect140", number: "361B" },
+
+  { key: "available-rect141", number: "358B" },
+
+  { key: "available-rect30", number: "124" },
+
+  { key: "available-rect136", number: "408" },
+
+  { key: "available-rect137", number: "383" },
+
+  { key: "available-rect142", number: "358B" },
+
+  { key: "available-rect144", number: "336G" },
+
+  { key: "available-rect145", number: "336G" },
+
+  { key: "available-rect146", number: "336C" },
+
+  { key: "available-rect148", number: "347" },
+
+  { key: "available-rect149", number: "347" },
+
+  { key: "available-rect150", number: "371" },
+
+  { key: "available-rect151", number: "369" },
+
+  { key: "available-rect152", number: "368" },
+
+  { key: "available-rect153", number: "346" },
+
+  { key: "available-rect154", number: "345" },
+
+  { key: "available-rect155", number: "341" },
+
+  { key: "available-rect156", number: "366" },
+
+  { key: "available-rect157", number: "382" },
+
+  { key: "available-rect158", number: "361" },
+
+  { key: "available-rect159", number: "356" },
+
+  { key: "available-rect160", number: "337" },
+
+  { key: "available-rect161", number: "327" },
+
+  { key: "available-rect162", number: "137" },
+
+  { key: "available-rect163", number: "136" },
+
+  { key: "available-rect164", number: "329" },
+
+  { key: "available-rect165", number: "336G" },
+
+  { key: "available-rect166", number: "336B" },
+
+  { key: "available-rect167", number: "336A" },
+
+  { key: "available-rect168", number: "336A" },
+
+  { key: "available-rect169", number: "335" },
+
+  { key: "available-rect170", number: "333" },
+
+  { key: "available-rect171", number: "332" },
+
+  { key: "available-rect172", number: "331" },
+
+  { key: "available-rect173", number: "332" },
+
+  { key: "available-rect174", number: "135A" },
+
+  { key: "available-rect175", number: "135" },
+
+  { key: "available-rect176", number: "132" },
+
+  { key: "available-rect177", number: "129" },
+
+  { key: "available-rect178", number: "128" },
+
+  { key: "available-rect179", number: "127" },
+
+  { key: "available-rect180", number: "126" },
+
+  { key: "available-rect181", number: "125" },
+
+  { key: "available-rect272", number: "420G" },
+
+  { key: "available-rect273", number: "154" },
+
+  { key: "available-rect276", number: "149" },
+
+  { key: "available-rect277", number: "296" },
+
+  { key: "available-rect279", number: "141A" },
+
+  { key: "available-rect280", number: "309" },
+
+  { key: "available-rect281", number: "308" },
+
+  { key: "available-rect282", number: "318" },
+
+  { key: "available-rect283", number: "317" },
+
+  { key: "available-rect284", number: "143" },
+
+  { key: "available-rect285", number: "148" },
+
+  { key: "available-rect286", number: "139" },
+
+  { key: "available-rect287", number: "138" },
+
+  { key: "available-rect318", number: "391" },
+
+  { key: "available-rect319", number: "426" },
+
+  { key: "available-rect320", number: "448" },
+
+  { key: "available-rect321", number: "454" },
+
+  { key: "available-rect322", number: "418" },
+
+  { key: "available-rect323", number: "417" },
+
+  { key: "available-rect324", number: "394" },
+
+  { key: "available-rect325", number: "393" },
+
+  { key: "available-rect326", number: "372" },
+
+  { key: "available-rect327", number: "376" },
+
+  { key: "available-rect328", number: "376" },
+
+  { key: "available-rect329", number: "373" },
+
+  { key: "available-rect330", number: "395" },
+
+  { key: "available-rect331", number: "453" },
+
+  { key: "available-rect332", number: "450" },
+
+  { key: "available-rect333", number: "267" },
+
+  { key: "available-rect334", number: "137" },
+
+  { key: "available-rect368", number: "420F" },
+
+  { key: "available-rect369", number: "420E" },
+
+  { key: "available-rect370", number: "420D" },
+
+  { key: "available-rect371", number: "420B" },
+
+  { key: "available-rect372", number: "420A" },
+
+  { key: "available-rect373", number: "420" },
+
+  { key: "available-rect374", number: "421" },
+
+  { key: "available-rect375", number: "423" },
+
+  { key: "available-rect376", number: "428" },
+
+  { key: "available-rect377", number: "429" },
+
+  { key: "available-rect378", number: "390" },
+
+  { key: "available-rect379", number: "412" },
+
+  { key: "available-rect380", number: "411" },
+
+  { key: "available-rect381", number: "410" },
+
+  { key: "available-rect382", number: "409" },
+
+  { key: "available-rect383", number: "409" },
+
+  { key: "available-rect384", number: "432" },
+
+  { key: "available-rect385", number: "432" },
+
+  { key: "available-rect422", number: "281" },
+
+  { key: "available-rect423", number: "273" },
+
+  { key: "available-rect424", number: "272" },
+
+  { key: "available-rect425", number: "146" },
+
+  { key: "available-rect426", number: "293" },
+
+  { key: "available-rect427", number: "293" },
+
+  { key: "available-rect428", number: "286A" },
+
+  { key: "available-rect429", number: "286A" },
+
+  { key: "available-rect430", number: "271" },
+
+  { key: "available-rect431", number: "271" },
+
+  { key: "available-rect432", number: "517" },
+
+  { key: "available-rect433", number: "521" },
+
+  { key: "available-rect434", number: "520" },
+
+  { key: "available-rect435", number: "530" },
+
+  { key: "available-rect436", number: "527" },
+
+  { key: "available-rect437", number: "220" },
+
+  { key: "available-rect438", number: "214" },
+
+  { key: "available-rect439", number: "190" },
+
+  { key: "available-rect440", number: "191" },
+
+  { key: "available-rect441", number: "192" },
+
+  { key: "available-rect442", number: "192A" },
+
+  { key: "available-rect443", number: "192B" },
+
+  { key: "available-rect444", number: "212" },
+
+  { key: "available-rect445", number: "212" },
+
+  { key: "available-rect446", number: "442" },
+
+  { key: "available-rect447", number: "440" },
+
+  { key: "available-rect448", number: "420L" },
+
+  { key: "available-rect449", number: "420J" },
+
+  { key: "available-rect450", number: "420H" },
+
+  { key: "available-rect507", number: "276" },
+
+  { key: "available-rect508", number: "281A" },
+
+  { key: "available-rect509", number: "275" },
+
+  { key: "available-rect510", number: "275" },
+
+  { key: "available-rect511", number: "274" },
+
+  { key: "available-rect512", number: "274" },
+
+  { key: "available-rect513", number: "159" },
+
+  { key: "available-rect514", number: "158" },
+
+  { key: "available-rect515", number: "158" },
+
+  { key: "available-rect516", number: "281A" },
+
+  { key: "available-rect517", number: "281" },
+
+  { key: "available-rect518", number: "155" },
+
+  { key: "available-rect519", number: "154" },
+
+  { key: "available-rect520", number: "151" },
+
+  { key: "available-rect521", number: "150" },
+
+  { key: "available-rect550", number: "237" },
+
+  { key: "available-rect551", number: "222" },
+
+  { key: "available-rect552", number: "239" },
+
+  { key: "available-rect553", number: "519" },
+
+  { key: "available-rect554", number: "519" },
+
+  { key: "available-rect555", number: "223" },
+
+  { key: "available-rect556", number: "548" },
+
+  { key: "available-rect557", number: "540" },
+
+  { key: "available-rect558", number: "538" },
+
+  { key: "available-rect559", number: "534" },
+
+  { key: "available-rect560", number: "534" },
+
+  { key: "available-rect561", number: "501" },
+
+  { key: "available-rect562", number: "280" },
+
+  { key: "available-rect563", number: "509" },
+
+  { key: "available-rect564", number: "278" },
+
+  { key: "available-rect565", number: "509" },
+
+  { key: "available-rect566", number: "257" },
+
+  { key: "available-rect567", number: "510" },
+
+  { key: "available-rect568", number: "163" },
+
+  { key: "available-rect570", number: "279" },
+
+  { key: "available-rect571", number: "160" },
+
+  { key: "available-rect572", number: "278" },
+
+  { key: "available-rect573", number: "277" },
+
+  { key: "available-rect574", number: "281A" },
+
+  { key: "available-rect625", number: "500B" },
+
+  { key: "available-rect626", number: "231" },
+
+  { key: "available-rect627", number: "231" },
+
+  { key: "available-rect628", number: "171A" },
+
+  { key: "available-rect629", number: "170" },
+
+  { key: "available-rect630", number: "170" },
+
+  { key: "available-rect631", number: "169" },
+
+  { key: "available-rect633", number: "169" },
+
+  { key: "available-rect634", number: "164" },
+
+  { key: "available-rect635", number: "170" },
+
+  { key: "available-rect636", number: "552A" },
+
+  { key: "available-rect637", number: "552A" },
+
+  { key: "available-rect638", number: "501" },
+
+  { key: "available-rect665", number: "213" },
+
+  { key: "available-rect666", number: "223" },
+
+  { key: "available-rect667", number: "225" },
+
+  { key: "available-rect668", number: "226" },
+
+  { key: "available-rect669", number: "227" },
+
+  { key: "available-rect670", number: "228" },
+
+  { key: "available-rect671", number: "229" },
+
+  { key: "available-rect672", number: "229" },
+
+  { key: "available-rect673", number: "223" },
+
+  { key: "available-rect674", number: "179G" },
+
+  { key: "available-rect675", number: "179G" },
+
+  { key: "available-rect676", number: "179E" },
+
+  { key: "available-rect677", number: "179C" },
+
+  { key: "available-rect678", number: "179" },
+
+  { key: "available-rect679", number: "179" },
+
+  { key: "available-rect680", number: "177" },
+
+  { key: "available-rect681", number: "177" },
+
+  { key: "available-rect682", number: "175" },
+
+  { key: "available-rect683", number: "172" },
+
+  { key: "available-rect684", number: "233A" },
+
+  { key: "available-rect685", number: "233A" },
+
+  { key: "available-rect686", number: "233" },
+
+  { key: "available-rect687", number: "234" },
+
+  { key: "available-rect688", number: "235" },
+
+  { key: "available-rect689", number: "236" },
+
+  { key: "available-rect690", number: "237" },
+
+  { key: "available-rect741", number: "198" },
+
+  { key: "available-rect742", number: "198" },
+
+  { key: "available-rect743", number: "200" },
+
+  { key: "available-rect744", number: "201" },
+
+  { key: "available-rect745", number: "202" },
+
+  { key: "available-rect746", number: "203" },
+
+  { key: "available-rect747", number: "204" },
+
+  { key: "available-rect748", number: "204" },
+
+  { key: "available-rect749", number: "205" },
+
+  { key: "available-rect750", number: "206" },
+
+  { key: "available-rect751", number: "206" },
+
+  { key: "available-rect752", number: "207" },
+
+  { key: "available-rect753", number: "209" },
+
+  { key: "available-rect754", number: "210" },
+
+  { key: "available-rect755", number: "211" },
+
+  { key: "available-rect756", number: "211" },
+
+  { key: "available-rect787", number: "450" },
+
+  { key: "available-rect788", number: "197" },
+
+  { key: "available-rect789", number: "188" },
+
+  { key: "available-rect790", number: "187" },
+
+  { key: "available-rect791", number: "186" },
+
+  { key: "available-rect792", number: "185" },
+
+  { key: "available-rect793", number: "182" },
+
+  { key: "available-rect794", number: "181" },
+
+  { key: "available-rect809", number: "170" },
+
+  { key: "available-rect811", number: "169" },
+
+  { key: "available-rect813", number: "161" },
+
+  { key: "available-rect815", number: "153" },
+
+  { key: "available-rect817", number: "151" },
+
+  { key: "available-rect819", number: "144" },
+
+  { key: "available-rect821", number: "145" },
+
+  { key: "available-rect823", number: "317" },
+
+  { key: "available-rect825", number: "383" },
+
+  { key: "available-rect827", number: "375" },
+
+  { key: "available-rect829", number: "451" },
+
+  { key: "available-rect831", number: "199" },
+
+  { key: "available-rect833", number: "196" },
+
+  { key: "available-rect835", number: "104" },
 ]
 
 export const stallsByKey = new Map(stalls.map((stall) => [stall.key, stall]))
 
-export const stallKeysByNumber = stalls.reduce<Map<string, string[]>>((index, stall) => {
-  const normalized = stall.number.trim().toUpperCase()
-  const keys = index.get(normalized) ?? []
-  keys.push(stall.key)
-  index.set(normalized, keys)
-  return index
-}, new Map())
+export const stallKeysByNumber = stalls.reduce<Map<string, string[]>>(
+  (index, stall) => {
+    const normalized = stall.number.trim().toUpperCase()
+
+    const keys = index.get(normalized) ?? []
+
+    keys.push(stall.key)
+
+    index.set(normalized, keys)
+
+    return index
+  },
+  new Map(),
+)

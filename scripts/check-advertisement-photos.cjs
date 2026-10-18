@@ -1,0 +1,27 @@
+const {chromium}=require('playwright');
+const assert=require('node:assert/strict');
+(async()=>{const browser=await chromium.launch({channel:'msedge'});try{for(const width of [390,1366]){
+ const context=await browser.newContext({viewport:{width,height:1000},storageState:{cookies:[],origins:[]}});
+ await context.route('**/*',route=>['GET','HEAD'].includes(route.request().method())?route.continue():route.abort());
+ const page=await context.newPage();await page.clock.setFixedTime(new Date('2026-10-18T12:00:00+02:00'));
+ await page.goto(process.env.TEST_URL||'http://127.0.0.1:4173');assert.equal(await page.evaluate(()=>localStorage.length),0);
+ await page.getByRole('button',{name:'EN',exact:true}).click();
+ assert.equal(await page.locator('.today-specials-heading > span').count(),0);
+ await page.getByRole('button',{name:'Administration',exact:true}).click();
+ const editor=page.locator('.admin-specials-editor');assert.equal(await editor.locator('input[type="file"]').count(),4);assert.equal(await editor.locator('.admin-special-icon').count(),0);
+ const data=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=800;c.height=600;const ctx=c.getContext('2d');ctx.fillStyle='#ac361d';ctx.fillRect(0,0,800,600);return c.toDataURL().split(',')[1]});
+ await page.locator('#advertisement-photo-0').setInputFiles({name:'offer.png',mimeType:'image/png',buffer:Buffer.from(data,'base64')});
+ await editor.locator('.admin-image-preview').waitFor();
+ assert.equal(await editor.locator('.admin-image-preview').evaluate(e=>e.naturalWidth),400);
+ assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ if(width===390)await editor.screenshot({path:'.tmp-ad-photo-admin.png'});
+ await editor.getByRole('button',{name:'Save advertisement',exact:true}).click();
+ await page.reload();await page.getByRole('button',{name:'EN',exact:true}).click();
+ const first=page.locator('.today-specials-card li').first();await first.locator('img').waitFor();assert.equal(await first.locator('img').evaluate(e=>e.naturalWidth),400);
+ assert.equal(await page.locator('.today-specials-card li').nth(1).locator('img').count(),0);
+ assert.equal(await page.locator('.today-specials-heading > span').count(),0);
+ await page.getByRole('button',{name:'Administration',exact:true}).click();await editor.locator('.admin-image-preview').waitFor();
+ await editor.getByRole('button',{name:'Remove image',exact:true}).click();await editor.getByRole('button',{name:'Save advertisement',exact:true}).click();
+ await page.getByRole('button',{name:'Public map',exact:true}).click();assert.equal(await first.locator('img').count(),0);
+ await context.close();console.log('PASS '+width+'px: photo replaces icon field, preview/upload, save/reload, matching product card, removal, no schedule label, no layout overflow; isolated storage discarded.');
+}}finally{await browser.close()}})().catch(e=>{console.error(e);process.exit(1)});
