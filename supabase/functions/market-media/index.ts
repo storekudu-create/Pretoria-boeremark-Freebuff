@@ -33,7 +33,9 @@ Deno.serve(async (req: Request) => {
         method: "POST",
         headers: {
           apikey: anon,
-          Authorization: req.headers.get("authorization") || "",
+          ...(req.headers.get("authorization")
+            ? { Authorization: req.headers.get("authorization")! }
+            : {}),
           "Content-Type": "application/json",
         },
         body: "{}",

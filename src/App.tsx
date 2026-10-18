@@ -381,10 +381,11 @@ function App() {
   const [saturdaySpecials, setSaturdaySpecials] = useState<TodaySpecial[]>([])
   const [sponsors,setSponsors] = useState<Sponsor[]>([])
   const [sponsorsRevision,setSponsorsRevision] = useState(1)
+  const [publicAdministration,setPublicAdministration] = useState(false)
   const [cloudError, setCloudError] = useState("")
   const [cloudLoading, setCloudLoading] = useState(true)
   const refreshMarket = async () => {
-    try { const market = await fetchMarket(); setListings(market.listings); setSaturdaySpecials(market.specials); setSponsors(market.sponsors); setSponsorsRevision(market.sponsorsRevision); setCloudError("") }
+    try { const market = await fetchMarket(); setListings(market.listings); setSaturdaySpecials(market.specials); setSponsors(market.sponsors); setSponsorsRevision(market.sponsorsRevision); setPublicAdministration(market.publicAdministration); setCloudError("") }
     catch { setCloudError(language === "af" ? "Kon nie die jongste lysings laai nie. Probeer weer." : "Unable to load the latest listings. Please retry.") }
     finally { setCloudLoading(false) }
   }
@@ -645,7 +646,7 @@ function App() {
 
   if (page === "admin") {
     return (
-      <AdminAccess language={language} onBack={() => setPage("map")}><AdminPage
+      <AdminAccess publicAccess={publicAdministration} language={language} onBack={() => setPage("map")}><AdminPage
         language={language}
         listings={listings}
         saturdaySpecials={saturdaySpecials}

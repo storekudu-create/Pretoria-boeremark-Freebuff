@@ -10,7 +10,9 @@ export default function AdminAccess({
   children,
   onBack,
   language,
+  publicAccess,
 }: {
+  publicAccess: boolean
   children: ReactNode
   onBack: () => void
   language: "af" | "en"
@@ -22,6 +24,17 @@ export default function AdminAccess({
   const [allowed, setAllowed] = useState(hasAdminSession)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
+  if (publicAccess)
+    return (
+      <>
+        <div className="admin-session" role="status">
+          {af
+            ? "Tydelike modus: Administrasie is oop sonder aanmelding."
+            : "Temporary mode: Administration is open without sign-in."}
+        </div>
+        {children}
+      </>
+    )
   if (allowed)
     return (
       <>

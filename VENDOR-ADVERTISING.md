@@ -4,6 +4,8 @@ The public map reads shared listings from the Supabase project **Pretoria Boerem
 
 ## Market administrator
 
+**Current temporary mode:** Administration opens directly without email or password. Anyone visiting the site can manage listings, sponsors, photos and vendor links. The market owner explicitly enabled this mode. To restore private administration, run `update public.bm_settings set public_administration=false where id=1;` in the Supabase SQL editor. This immediately protects write operations again; refreshing the app also restores the sign-in screen. The instructions below apply when sign-in is restored.
+
 1. Open Administration and enter `myeposb@gmail.com`.
 2. Request the sign-in email. Copy the email's sign-in link address and paste it in the form, or paste its verification code if supplied. Do not open the email link: the form verifies it directly without depending on a dashboard redirect setting.
 3. Select the stall and choose **Create / replace private link**. Give that link only to its vendor. The expandable code is an alternative way to sign in.

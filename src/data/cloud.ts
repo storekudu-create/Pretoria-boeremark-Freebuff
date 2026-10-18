@@ -49,6 +49,7 @@ export async function fetchMarket(): Promise<{
   specials: TodaySpecial[]
   sponsors: Sponsor[]
   sponsorsRevision: number
+  publicAdministration: boolean
 }> {
   const [rows, settings] = await Promise.all([
     request(
@@ -57,7 +58,7 @@ export async function fetchMarket(): Promise<{
       "",
     ),
     request(
-      "/rest/v1/bm_settings?id=eq.1&select=specials,sponsors,sponsors_revision",
+      "/rest/v1/bm_settings?id=eq.1&select=specials,sponsors,sponsors_revision,public_administration",
       undefined,
       "",
     ),
@@ -79,6 +80,7 @@ export async function fetchMarket(): Promise<{
     specials: settings[0]?.specials ?? [],
     sponsors: settings[0]?.sponsors ?? [],
     sponsorsRevision: settings[0]?.sponsors_revision ?? 1,
+    publicAdministration: settings[0]?.public_administration === true,
   }
 }
 export async function sendAdminCode(email: string) {
@@ -139,7 +141,9 @@ export async function uploadMarketImage(
       "x-stall-key": key,
       ...(token
         ? { "x-vendor-code": token }
-        : { Authorization: "Bearer " + adminToken }),
+        : adminToken
+          ? { Authorization: "Bearer " + adminToken }
+          : {}),
     },
     body: blob,
     signal: AbortSignal.timeout(60_000),
