@@ -1,5 +1,11 @@
+import MapFooter from "./components/MapFooter"
+import SponsorBanner from "./components/SponsorBanner"
+import type { Sponsor } from "./data/sponsors"
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react"
 
+import VendorPortal from "./components/VendorPortal"
+import AdminAccess from "./components/AdminAccess"
+import { fetchMarket, saveAdminListing, rpc } from "./data/cloud"
 import AdminPage from "./components/AdminPage"
 import AdvertisingListings from "./components/AdvertisingListings"
 import { isWeeklySpecialsTime } from "./data/specialsSchedule"
@@ -7,17 +13,9 @@ import { isWeeklySpecialsTime } from "./data/specialsSchedule"
 import MarketMap, { type MarketMapHandle } from "./components/MarketMap"
 
 import {
-  createDefaultListings,
-  defaultTodaySpecials,
   type AvailabilityStatus,
   isFeaturedActive,
   listingCategories,
-  readListings,
-  saveListings,
-  readTodaySpecials,
-  saveTodaySpecials,
-  subscribeToListings,
-  subscribeToTodaySpecials,
   type ListingCategory,
   type ListingsByKey,
   type StallListing,
@@ -26,7 +24,7 @@ import {
 
 type Language = "af" | "en"
 
-type Page = "map" | "admin"
+type Page = "map" | "admin" | "vendor"
 
 const copy = {
   af: {
@@ -38,7 +36,7 @@ const copy = {
       "Verken die mark, soek ’n stalletjie of produk, of tik op die kaart.",
 
     demoNotice:
-      "DEMO-DATA: Besighede, produkte en aanbiedinge is fiktiewe toetsdata.",
+      "Sommige lysings bevat DEMO-data. Bevestig besonderhede by die uitstaller.",
 
     demoStatusNotice: "Stalletjiestatusse is fiktiewe toetsdata.",
 
@@ -153,7 +151,7 @@ const copy = {
     intro: "Explore the market, search for a stall or product, or tap the map.",
 
     demoNotice:
-      "DEMO DATA: Businesses, products and specials are fictional test listings.",
+      "Some listings contain DEMO data. Confirm details with the vendor.",
 
     demoStatusNotice: "Stall statuses are fictional test data.",
 
@@ -356,7 +354,7 @@ function ResetIcon() {
 function App() {
   const [language, setLanguage] = useState<Language>("af")
 
-  const [page, setPage] = useState<Page>("map")
+  const [page, setPage] = useState<Page>(() => new URLSearchParams(location.hash.slice(1)).has("vendor") ? "vendor" : "map")
 
   const [query, setQuery] = useState("")
 
@@ -379,31 +377,26 @@ function App() {
     isWeeklySpecialsTime(new Date(), 9 * 60 + 30),
   )
 
-  const [listings, setListings] = useState<ListingsByKey>(() => {
-    if (typeof window === "undefined") return createDefaultListings()
-
-    try {
-      return readListings()
-    } catch (error) {
-      console.error("Unable to initialize market listings", error)
-
-      return createDefaultListings()
-    }
-  })
-
-  const [saturdaySpecials, setSaturdaySpecials] = useState<TodaySpecial[]>(
-    () => {
-      if (typeof window === "undefined") {
-        return defaultTodaySpecials.map((special) => ({ ...special }))
-      }
-      try {
-        return readTodaySpecials()
-      } catch (error) {
-        console.error("Unable to initialize Saturday specials", error)
-        return defaultTodaySpecials.map((special) => ({ ...special }))
-      }
-    },
-  )
+  const [listings, setListings] = useState<ListingsByKey>({})
+  const [saturdaySpecials, setSaturdaySpecials] = useState<TodaySpecial[]>([])
+  const [sponsors,setSponsors] = useState<Sponsor[]>([])
+  const [sponsorsRevision,setSponsorsRevision] = useState(1)
+  const [publicAdministration,setPublicAdministration] = useState(false)
+  const [cloudError, setCloudError] = useState("")
+  const [cloudLoading, setCloudLoading] = useState(true)
+  const refreshMarket = async () => {
+    try { const market = await fetchMarket(); setListings(market.listings); setSaturdaySpecials(market.specials); setSponsors(market.sponsors); setSponsorsRevision(market.sponsorsRevision); setPublicAdministration(market.publicAdministration); setCloudError("") }
+    catch { setCloudError(language === "af" ? "Kon nie die jongste lysings laai nie. Probeer weer." : "Unable to load the latest listings. Please retry.") }
+    finally { setCloudLoading(false) }
+  }
+  useEffect(() => {
+    if (page !== "map") return
+    void refreshMarket()
+    const refresh = () => { if (document.visibilityState === "visible") void refreshMarket() }
+    const timer = window.setInterval(refresh, 60_000)
+    window.addEventListener("focus", refresh)
+    return () => { window.clearInterval(timer); window.removeEventListener("focus", refresh) }
+  }, [page])
 
   const mapRef = useRef<MarketMapHandle>(null)
 
@@ -472,31 +465,6 @@ function App() {
     }
   }, [])
 
-  useEffect(
-    () =>
-      subscribeToListings(() => {
-        try {
-          setListings(readListings())
-        } catch (error) {
-          console.error("Unable to refresh market listings", error)
-        }
-      }),
-
-    [],
-  )
-
-  useEffect(
-    () =>
-      subscribeToTodaySpecials(() => {
-        try {
-          setSaturdaySpecials(readTodaySpecials())
-        } catch (error) {
-          console.error("Unable to refresh Saturday specials", error)
-        }
-      }),
-    [],
-  )
-
   const matchingStalls = useMemo(() => {
     const term = normalize(submittedQuery)
 
@@ -553,17 +521,17 @@ function App() {
     selectStall(key)
   }
 
-  const handleSaveListings = (next: ListingsByKey) => {
-    saveListings(next)
-
-    setListings(next)
+  const handleSaveListings = async (next: StallListing) => {
+    const saved = await saveAdminListing(next)
+    setListings(current => ({...current, [saved.key]: saved}))
   }
-
-  const handleSaveSaturdaySpecials = (next: TodaySpecial[]) => {
-    saveTodaySpecials(next)
+  const handleSaveSaturdaySpecials = async (next: TodaySpecial[]) => {
+    await rpc("bm_admin_specials", { p_specials: next })
     setSaturdaySpecials(next)
   }
 
+  const vendorSpecials: TodaySpecial[] = Object.values(listings).filter(l => l.specialToday && l.special.trim()).map(l => ({ icon: "", product: l.special, stall: l.number, photo: l.specialImage }))
+  const publicSpecials = [...vendorSpecials, ...saturdaySpecials.filter(s => s.product.trim() && !vendorSpecials.some(v => v.stall === s.stall))]
   const stallDetails = (
 <section className="selection-card" aria-live="polite">
             <p className="card-label">{text.selected}</p>
@@ -588,6 +556,8 @@ function App() {
                     {categoryLabels[selected.category][language]}
                   </p>
                 )}
+                {selected.description && <p className="vendor-description">{selected.description}</p>}
+                {selected.promotionalOffer && <p className="special-text">{selected.promotionalOffer}</p>}
                 <div className="listing-badges">
                   {selected.premium && <span className="premium-pill">Premium</span>}
                   {selected.freeListing && <span className="free-listing-pill">{language === "af" ? "Gratis lysing" : "Free listing"}</span>}
@@ -605,14 +575,14 @@ function App() {
                     <span className="special-pill">{text.saturdaySpecial}</span>
                   )}
                 </div>
-                {selected.specialImage && (
+                {showSaturdaySpecials && selected.specialToday && selected.specialImage && (
                   <figure className="special-photo">
                     <img src={selected.specialImage}
                       alt={selected.special || (language === "af" ? "Die dag se spesiale aanbod" : "Special of the day")} />
                     <figcaption>{text.specialToday}</figcaption>
                   </figure>
                 )}
-                {selected.special && (
+                {showSaturdaySpecials && selected.specialToday && selected.special && (
                   <p
                     className={`special-text${
                       selected.specialToday ? " special-today" : ""
@@ -634,6 +604,8 @@ function App() {
                 ) : (
                   <p>{text.noProducts}</p>
                 )}
+                {!!selected.productPhotos?.length && <div className="public-product-photos">{selected.productPhotos.map((photo, i) => <a key={photo} href={photo} target="_blank" rel="noreferrer"><img src={photo} alt={(selected.businessName || selected.number) + (language === "af" ? " produkfoto " : " product photo ") + (i + 1)} loading="lazy" /></a>)}</div>}
+                {selected.website && /^https?:\/\//.test(selected.website) && <a className="vendor-website" href={selected.website} target="_blank" rel="noreferrer">{language === "af" ? "Besoek webwerf ↗" : "Visit website ↗"}</a>}
                 <div className="selection-actions">
                   <button
                     type="button"
@@ -670,16 +642,21 @@ function App() {
           </section>
   )
 
+  if (page === "vendor") return <VendorPortal language={language} onBack={() => {setPage("map");void refreshMarket()}} onSaved={saved => setListings(current => ({...current,[saved.key]:saved}))} />
+
   if (page === "admin") {
     return (
-      <AdminPage
+      <AdminAccess publicAccess={publicAdministration} language={language} onBack={() => setPage("map")}><AdminPage
         language={language}
         listings={listings}
         saturdaySpecials={saturdaySpecials}
+        sponsors={sponsors}
+        sponsorsRevision={sponsorsRevision}
+        onSaveSponsors={async (next, revision) => { const savedRevision = await rpc("bm_admin_sponsors",{p_sponsors:next,p_revision:revision}); setSponsors(next);setSponsorsRevision(savedRevision) }}
         onSave={handleSaveListings}
         onSaveSaturdaySpecials={handleSaveSaturdaySpecials}
         onBack={() => setPage("map")}
-      />
+      /></AdminAccess>
     )
   }
 
@@ -690,6 +667,8 @@ function App() {
 
   return (
     <main className="app-shell">
+      {cloudLoading && <p role="status">{language === "af" ? "Besig om lysings te laai…" : "Loading listings…"}</p>}
+      {cloudError && <p role="alert" className="vendor-error">{cloudError} <button className="secondary-button" onClick={() => void refreshMarket()}>{language === "af" ? "Probeer weer" : "Retry"}</button></p>}
       <header className="hero">
         <div>
           <p className="eyebrow">{text.eyebrow}</p>
@@ -697,6 +676,7 @@ function App() {
           <p className="intro">{text.intro}</p>
         </div>
         <div className="header-actions">
+          <button className="secondary-button" type="button" onClick={() => setPage("vendor")}>{language === "af" ? "Uitstaller-aanmelding" : "Vendor sign-in"}</button>
           <nav className="page-switch" aria-label={text.publicMap}>
             <button type="button" className="active" aria-current="page">
               {text.publicMap}
@@ -780,7 +760,8 @@ function App() {
               </p>
             )}
           </div>
-          <div className="map-card">
+          <div className="map-card has-sponsor">
+            <SponsorBanner sponsors={sponsors} language={language} />
             <MarketMap
               ref={mapRef}
               selectedKeys={selectedKey ? [selectedKey] : []}
@@ -824,13 +805,13 @@ function App() {
             </div>
           </div>
           </div>
-          {showSaturdaySpecials && (
+          {showSaturdaySpecials && publicSpecials.length > 0 && (
             <section className="today-specials-card" aria-live="polite">
               <div className="today-specials-heading">
                 <h2>{text.todaySpecials}</h2>
               </div>
               <ul>
-                {saturdaySpecials.map((special, index) => {
+                {publicSpecials.map((special, index) => {
                   const stall = Object.values(listings).find(
                     (listing) => listing.number === special.stall,
                   )
@@ -946,7 +927,9 @@ function App() {
 
           {stallDetails}
 
-          <section className="legend-card">
+        </aside>
+      </section>
+      <MapFooter language={language} hidden={mapExpanded || detailsOpen} legend={<section className="legend-card">
             <p className="card-label">{text.legend}</p>
             <div className="legend-row">
               <span className="legend-swatch swatch-other" />
@@ -979,9 +962,7 @@ function App() {
                 </span>
               ))}
             </div>
-          </section>
-
-          <section className="market-info-card">
+          </section>} information={<section className="market-info-card">
             <p className="card-label">{text.marketInfo}</p>
             <h2>{text.title}</h2>
             <p>{text.marketIntro}</p>
@@ -1017,9 +998,7 @@ function App() {
             >
               {text.directions} · {text.marketLocation}
             </a>
-          </section>
-        </aside>
-      </section>
+          </section>} />
       <dialog
         ref={detailsDialogRef}
         className="stall-details-dialog"

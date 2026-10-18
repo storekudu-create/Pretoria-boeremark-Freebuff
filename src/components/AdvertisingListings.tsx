@@ -14,7 +14,7 @@ export default function AdvertisingListings({ listings, language, showSaturdaySp
   const groups = [
     { id: "premium", title: "Premium", description: af ? "Ontdek ons premium stalletjies" : "Discover our premium stalls", items: listings.filter((listing) => listing.premium) },
     { id: "featured", title: af ? "Uitgelig" : "Featured", description: af ? "Stalletjies in die kollig" : "Stalls in the spotlight", items: listings.filter((listing) => isFeaturedActive(listing)) },
-    ...(showSaturdaySpecials ? [{ id: "saturday", title: af ? "Saterdag-aanbod" : "Saturday Special", description: af ? "Aanbiedinge van ons stalletjies" : "Offers from our stalls", items: listings.filter((listing) => listing.saturdaySpecial) }] : []),
+    ...(showSaturdaySpecials ? [{ id: "saturday", title: af ? "Saterdag-aanbod" : "Saturday Special", description: af ? "Aanbiedinge van ons stalletjies" : "Offers from our stalls", items: listings.filter((listing) => listing.saturdaySpecial || (listing.specialToday && Boolean(listing.special))) }] : []),
     { id: "free", title: af ? "Gratis lysings" : "Free listings", description: af ? "Verken die mark se besighede" : "Explore businesses at the market", items: listings.filter((listing) => listing.freeListing) },
   ]
 

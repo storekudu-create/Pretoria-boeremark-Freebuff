@@ -55,6 +55,11 @@ export type StallListing = {
   number: string
 
   businessName: string
+  description?: string
+  website?: string
+  promotionalOffer?: string
+  productPhotos?: string[]
+  revision?: number
 
   logoImage?: string
 

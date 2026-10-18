@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react"
 
+import SponsorEditor from "./SponsorEditor"
+import type { Sponsor } from "../data/sponsors"
+import VendorAccess from "./VendorAccess"
 import ListingImageUpload from "./ListingImageUpload"
 import MarketMap, { type MarketMapHandle } from "./MarketMap"
 import {
+  readListings,
   availabilityStatuses,
   listingCategories,
   type AvailabilityStatus,
@@ -21,9 +25,12 @@ type AdminPageProps = {
 
   listings: ListingsByKey
   saturdaySpecials: TodaySpecial[]
+  sponsors: Sponsor[]
+  sponsorsRevision: number
+  onSaveSponsors: (sponsors: Sponsor[], revision: number) => Promise<void>
 
-  onSave: (listings: ListingsByKey) => void
-  onSaveSaturdaySpecials: (specials: TodaySpecial[]) => void
+  onSave: (listing: StallListing) => Promise<void>
+  onSaveSaturdaySpecials: (specials: TodaySpecial[]) => Promise<void>
 
   onBack: () => void
 }
@@ -224,6 +231,9 @@ function AdminPage({
   language,
   listings,
   saturdaySpecials,
+  sponsors,
+  sponsorsRevision,
+  onSaveSponsors,
   onSave,
   onSaveSaturdaySpecials,
   onBack,
@@ -244,10 +254,11 @@ function AdminPage({
     selectedListing ? makeDraft(selectedListing) : undefined,
   )
 
+  const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState("")
   const [imageUploads, setImageUploads] = useState(0)
 
-  const [specialsDraft, setSpecialsDraft] = useState(saturdaySpecials)
+  const [specialsDraft, setSpecialsDraft] = useState<TodaySpecial[]>(() => saturdaySpecials.length ? saturdaySpecials : Array.from({length:4},() => ({icon:"",product:"",stall:""})))
 
   const [specialsMessage, setSpecialsMessage] = useState("")
   const [specialPhotoUploads, setSpecialPhotoUploads] = useState(0)
@@ -259,7 +270,7 @@ function AdminPage({
   }, [selectedListing])
 
   useEffect(() => {
-    setSpecialsDraft(saturdaySpecials.map((special) => ({ ...special })))
+    setSpecialsDraft(saturdaySpecials.length ? saturdaySpecials.map((special) => ({ ...special })) : Array.from({length:4},() => ({icon:"",product:"",stall:""})))
   }, [saturdaySpecials])
 
   const changeStall = (key: string) => {
@@ -291,22 +302,23 @@ function AdminPage({
     setSpecialsMessage("")
   }
 
-  const handleSpecialsSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSpecialsSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (specialPhotoUploads > 0) return
     try {
-      onSaveSaturdaySpecials(specialsDraft)
+      setSaving(true)
+      await onSaveSaturdaySpecials(specialsDraft)
       setSpecialsMessage(text.specialsSaved)
     } catch (error) {
       console.error("Unable to save Saturday specials", error)
-      setSpecialsMessage(text.error)
-    }
+      setSpecialsMessage((error as Error).message || text.error)
+    } finally { setSaving(false) }
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (!draft || imageUploads > 0) return
+    if (!draft || imageUploads > 0 || saving) return
 
     const next = {
       ...listings,
@@ -317,14 +329,15 @@ function AdminPage({
     }
 
     try {
-      onSave(next)
+      setSaving(true)
+      await onSave(next[selectedKey])
 
       setMessage(text.saved)
     } catch (error) {
       console.error("Unable to save market listing", error)
 
-      setMessage(text.error)
-    }
+      setMessage((error as Error).message || text.error)
+    } finally { setSaving(false) }
   }
 
   return (
@@ -339,6 +352,7 @@ function AdminPage({
         </button>
       </header>
 
+      <SponsorEditor sponsors={sponsors} revision={sponsorsRevision} language={language} onSave={onSaveSponsors} />
       <section className="admin-card">
         <div className="admin-workspace">
           <div className="admin-map-column">
@@ -428,7 +442,7 @@ function AdminPage({
                 </fieldset>
               ))}
               <div className="admin-save-row">
-                <button type="submit" className="primary-button" disabled={specialPhotoUploads > 0}>
+                <button type="submit" className="primary-button" disabled={specialPhotoUploads > 0 || saving}>
                   {text.saveSpecials}
                 </button>
                 {specialsMessage && (
@@ -456,6 +470,8 @@ function AdminPage({
               ))}
             </select>
 
+            <VendorAccess key={selectedKey} stallKey={selectedKey} number={selectedListing?.number || ""} language={language} />
+            <button type="button" className="secondary-button" onClick={() => { if (confirm(language === "af" ? "Laai hierdie blaaier se ou besonderhede in die vorm? Klik Stoor om te publiseer." : "Load this browser’s old details into the form? Click Save to publish.")) { const old = readListings()[selectedKey]; if(old && selectedListing) setDraft({...old, key: selectedListing.key, number: selectedListing.number, revision: selectedListing.revision}) } }}>{language === "af" ? "Laai ou blaaierbesonderhede" : "Load old browser details"}</button>
             {draft && (
               <form className="admin-form" onSubmit={handleSubmit}>
                 <h2>
@@ -483,6 +499,13 @@ function AdminPage({
                   onChange={(value) => updateDraft("logoImage", value)}
                   onProcessingChange={(busy) => setImageUploads((count) => Math.max(0, count + (busy ? 1 : -1)))}
                 />
+                <label className="field-label" htmlFor="admin-description">{language === "af" ? "Beskrywing" : "Description"}</label>
+                <textarea id="admin-description" className="admin-input" rows={4} maxLength={2000} value={draft.description || ""} onChange={e => updateDraft("description",e.target.value)} />
+                <label className="field-label" htmlFor="admin-website">{language === "af" ? "Webwerf" : "Website"}</label>
+                <input id="admin-website" className="admin-input" type="url" maxLength={500} value={draft.website || ""} onChange={e => updateDraft("website",e.target.value)} />
+                <label className="field-label" htmlFor="admin-promotion">{language === "af" ? "Promosie-aanbod" : "Promotional offer"}</label>
+                <textarea id="admin-promotion" className="admin-input" rows={3} maxLength={2000} value={draft.promotionalOffer || ""} onChange={e => updateDraft("promotionalOffer",e.target.value)} />
+                {Array.from({length: Math.min(6,(draft.productPhotos?.length || 0)+1)},(_,i) => <ListingImageUpload key={draft.key + "-product-"+i} id={"admin-product-"+i} label={(language === "af" ? "Produkfoto " : "Product photo ")+(i+1)} language={language} kind="photo" value={draft.productPhotos?.[i]} onProcessingChange={busy => setImageUploads(n => Math.max(0,n+(busy?1:-1)))} onChange={value => setDraft(current => { if(!current)return current;const photos=[...(current.productPhotos || [])];if(value)photos[i]=value;else photos.splice(i,1);return {...current,productPhotos:photos} })} />)}
                 <label className="field-label" htmlFor="stall-category">
                   {text.category}
                 </label>
@@ -632,7 +655,7 @@ function AdminPage({
                 </label>
 
                 <div className="admin-save-row">
-                  <button type="submit" className="primary-button" disabled={imageUploads > 0}>
+                  <button type="submit" className="primary-button" disabled={imageUploads > 0 || saving}>
                     {text.save}
                   </button>
                   {message && (
@@ -645,7 +668,7 @@ function AdminPage({
             )}
           </div>
         </div>
-        <p className="storage-note">{text.storageNote}</p>
+        <p className="storage-note">{language === "af" ? "Veranderinge word aanlyn gestoor en met alle besoekers gedeel. DEMO-lysings is fiktief." : "Changes are saved online and shared with all visitors. DEMO listings are fictional."}</p>
       </section>
     </main>
   )
