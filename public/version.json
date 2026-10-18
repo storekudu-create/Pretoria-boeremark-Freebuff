@@ -1,4 +1,9 @@
 {
-  "version": "4.0.0",
-  "branch": "version4"
+  "version": "4.1.0",
+  "branch": "version4",
+  "features": [
+    "vendor-self-service",
+    "outside-sponsors",
+    "floating-map-footer"
+  ]
 }
